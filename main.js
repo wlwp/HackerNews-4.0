@@ -1,20 +1,22 @@
-const http = require('http')
+const express = require('express')
+const path = require('path')
 
-const server = http.createServer()
+const app = express()
+const bodyparser = require('body-parser')
+app.use(bodyparser.urlencoded({ extended: false }))
 
-// 引入路由
 const router = require('./router.js')
-// 引入extend
-const extend = require('./extend.js')
+app.use(router)
 
-server.on('request', (req, res) => {
-  extend(res)
+// 配置模板引擎
+app.engine('html', require('express-art-template'))
+// 忽略文件
+app.set('views', path.join(__dirname, './views'))
+// 忽略后缀
+app.set('view engine', 'html')
 
-  router(req,res)
-  
-})
-
-server.listen(8001, () => {
+// 处理静态资源
+app.use('/assets', express.static(path.join(__dirname, './assets')))
+app.listen(8001, () => {
   console.log('http://localhost:8001')
 })
-
